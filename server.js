@@ -20,6 +20,10 @@ app.use(bodyParser.json());
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
+// Create routes.
+require("./routes/html-routes.js")(app);
+require("./routes/api-routes.js")(app);
+
 app.listen(port, function(){
   console.log("App running on port " + port);
 });
