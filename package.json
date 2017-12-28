@@ -1,0 +1,29 @@
+{
+  "name": "mongoscraper",
+  "version": "1.0.0",
+  "description": "Scrapes articles from New York Times",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krieg2/MongoScraper.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/krieg2/MongoScraper/issues"
+  },
+  "homepage": "https://github.com/krieg2/MongoScraper#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cheerio": "^1.0.0-rc.2",
+    "dotenv": "^4.0.0",
+    "express": "^4.16.2",
+    "express-handlebars": "^3.0.0",
+    "mongoose": "^4.13.8",
+    "request": "^2.83.0"
+  }
+}
