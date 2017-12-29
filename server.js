@@ -35,7 +35,7 @@ app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
 // Create routes.
-require("./routes/html-routes.js")(app);
+require("./routes/html-routes.js")(app, db);
 require("./routes/api-routes.js")(app, request, cheerio, db);
 
 app.listen(port, function(){

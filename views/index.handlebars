@@ -1,45 +1,43 @@
 <body>
 
   <nav class="navbar navbar-expand-md navbar-light bg-white">
-
-    <a href="#" id="logo">Mongo Scraper</a>
-
-    <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Toggle navigation">
+    <div class="container">
+    <button class="navbar-toggler navbar-light" type="button" data-toggle="collapse" data-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse justify-content-end mr-2" id="menu">
+    <div class="collapse navbar-collapse justify-content-start mr-2" id="menu">
       <ul class="navbar-nav"">
         <li class="nav-item active"><a class="nav-link" href="/">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="/saved">Saved Articles</a></li>
-        <li class="nav-item"><a class="nav-link btn btn-primary btn-lg" role="button" href="/api/scrape">Scrape New Articles!</a></li>
+        <li class="nav-item"><a class="nav-link btn btn-sm btn-outline-danger" role="button" href="/api/scrape">Scrape New Articles!</a></li>
       </ul>
     </div>
-
+    </div>
   </nav>
  
   <div class="container">
     <div class="row">
       <div class="col col-sm-12">
         <div class="jumbotron" id="jumbo">
-          <h1 class="display-3">Mongo Scraper</h1>
-          <p class="lead">New York Times Edition</p>
+          <h1 class="display-3 text-white shadow">Mongo Scraper</h1>
+          <h5 class="text-white shadow">New York Times Edition</h5>
           <hr class="my-4">
-          <p>Scrapes articles from the New York Times and stores the headlines for future reference. Comments can be posted on saved articles.</p>
+          <p class="text-white shadow">Scrapes articles from the New York Times and stores the headlines for future reference.</p>
+          <p class="text-white shadow">Post comments on saved articles.</p>
         </div>
       </div>
     </div>
 
     <div class="row">
       <div class="col col-sm-12">
-        {{> article}}
+      	<!-- All articles -->
+      	{{#each articles}}
+          {{> article}}
+        {{/each}}
       </div>
     </div>
-  <!-- All articles -->
-  <!-- {{#each businesses}} -->
-   
-  <!-- {{/each}} -->
-  <!-- End -->
+
   </div>
 
 </body>

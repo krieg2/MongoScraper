@@ -3,3 +3,7 @@
   background-repeat: no-repeat;
   background-size: cover;
 }
+
+.shadow {
+  text-shadow: 2px 2px 4px #000000;
+}
