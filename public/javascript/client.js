@@ -13,7 +13,7 @@ $(document).ready(function(){
             if(response === undefined || response.length <= 0){
                 modalBody.text("No new articles at this time. Check again later.");
             } else{
-                modalBody.text(response.count + " new articles found.");
+                modalBody.text(response.length + " new articles found.");
             }
             $("#exampleModalCenter").modal("show");
 
@@ -50,4 +50,28 @@ function renderArticles(articles){
 
         $("#newsArea").prepend(card);
     }
+
+    if( $("#newsArea").children(".card").length === 0 ){
+        renderEmpty();
+    } else{
+        removeEmpty();
+    }
+
+}
+
+function renderEmpty(){
+
+    var div = $("<div class='alert alert-warning' role='alert'>");
+    div.text("No new artciles have been added!");
+    div.attr("id", "no-articles-warning");
+    $("#newsArea").prepend(div);
+
+}
+
+function removeEmpty(){
+
+    if( $("#newsArea").children(".alert").length > 0 ){
+        $("#no-articles-warning").detach();
+    }
+
 }
