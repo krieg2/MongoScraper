@@ -22,7 +22,6 @@ module.exports = (app, request, cheerio, Article) => {
 
                 var $ = cheerio.load(html);
                 var results = [];
-                var count = 0;
 
                 $("#top-news").find("article").each( (i, element) => {
 
@@ -41,10 +40,10 @@ module.exports = (app, request, cheerio, Article) => {
                             var article = {
                               timesId: id,
                               heading: linkText,
-                              link: linkHref,
+                              link:    linkHref,
                               summary: summary
                             };
-                            count++;
+                            results.push(article);
                             Article.create(article, (err, data) => {
                                 if (err) console.log(err);
                                 // saved!
@@ -54,7 +53,7 @@ module.exports = (app, request, cheerio, Article) => {
 
                 }); // end each
 
-                res.json({count: count});
+                res.json(results);
             }); // end request
         }); // end find
 
