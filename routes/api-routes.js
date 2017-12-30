@@ -1,48 +1,62 @@
 
-module.exports = (app, request, cheerio, db) => {
+module.exports = (app, request, cheerio, Article) => {
 
     app.get("/api/articles", (req, res) => {
     
-        res.json({});
+        Article.find({}, (err, data) => {
+            res.json(data);
+        });
 
     });
 
     app.get("/api/scrape", (req, res) => {
 
-        request("https://www.nytimes.com", (error, response, html) => {
+        Article.find({}, (err, data) => {
 
-            var $ = cheerio.load(html);
-            var results = [];
-
-            $("#top-news").find("article").each( (i, element) => {
-                // Only grab 20 at a time.
-               if(i >= 20){
-                   return false;
-                }
-                var id = $(element).data("story-id");
-                var heading = $(element).find("h2.story-heading").first();
-                var link = $(heading).find("a").first();
-                var linkText = link.text().trim();
-                var linkHref = link.attr("href");
-                var summary = $(element).find("p[class=summary]").first().text().trim();
-                
-                // Save these results, if there is a heading, summary and link.
-                if(linkText !== "" && summary !== "" && linkHref !== ""){
-                    results.push({
-                      timesId: id,
-                      heading: linkText,
-                      link: linkHref,
-                      summary: summary
-                    });
-                }
-            }); // end each
-
-            for(let i=0; i < results.length; i++){
-                db.articles.insert(results[i]);
+            var storyIds = [];
+            for(let i=0; i < data.length; i++){
+                storyIds[ data[i].timesId ] = true;
             }
 
-            res.redirect("/");
-        }); // end request
+            request("https://www.nytimes.com", (error, response, html) => {
+
+                var $ = cheerio.load(html);
+                var results = [];
+                var count = 0;
+
+                $("#top-news").find("article").each( (i, element) => {
+
+                    var id = $(element).data("story-id");
+
+                    if(storyIds[id] === undefined){
+
+                        var heading = $(element).find("h2.story-heading").first();
+                        var link = $(heading).find("a").first();
+                        var linkText = link.text().trim();
+                        var linkHref = link.attr("href");
+                        var summary = $(element).find("p[class=summary]").first().text().trim();
+                        
+                        // Save these results, if there is a heading, summary and link.
+                        if(linkText !== "" && summary !== "" && linkHref !== ""){
+                            var article = {
+                              timesId: id,
+                              heading: linkText,
+                              link: linkHref,
+                              summary: summary
+                            };
+                            count++;
+                            Article.create(article, (err, data) => {
+                                if (err) console.log(err);
+                                // saved!
+                            });
+                        }
+                    }
+
+                }); // end each
+
+                res.json({count: count});
+            }); // end request
+        }); // end find
 
     });
 

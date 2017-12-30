@@ -1,9 +1,9 @@
 
-module.exports = (app, db) => {
+module.exports = (app, Article) => {
 
     app.get("/", (req, res) => {
     
-        db.articles.find({}, (err, data) => {
+        Article.find({}, (err, data) => {
 	        if (err){
 	            console.log(err);
 	        } else{
