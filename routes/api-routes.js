@@ -1,9 +1,27 @@
 
 module.exports = (app, request, cheerio, Article) => {
 
+    app.put("/api/save/article/:id", (req, res) => {
+        Article.update({timesId: req.params.id}, {saved: true}, (err, rawResponse) => {
+            res.end();
+        });
+    });
+
     app.get("/api/articles", (req, res) => {
     
         Article.find({}, (err, data) => {
+            if (err) console.log(err);
+            res.json(data);
+        });
+
+    });
+
+    app.get("/api/articles/:saved", (req, res) => {
+    
+        // Convert string to boolean.
+        var saved = (req.params.saved === "true") ? true : false;
+        Article.find({saved: saved}, (err, data) => {
+            if (err) console.log(err);
             res.json(data);
         });
 
@@ -41,7 +59,8 @@ module.exports = (app, request, cheerio, Article) => {
                               timesId: id,
                               heading: linkText,
                               link:    linkHref,
-                              summary: summary
+                              summary: summary,
+                              saved:   false
                             };
                             results.push(article);
                             Article.create(article, (err, data) => {

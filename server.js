@@ -23,7 +23,7 @@ var schema = new mongoose.Schema({
     heading   : String,
     link      : String,
     summary   : String,
-    saved     : Boolean,
+    saved     : { type: Boolean, default: false },
     comments  : [ String ]
 });
  

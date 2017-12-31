@@ -8,9 +8,8 @@
 
     <div class="collapse navbar-collapse justify-content-start mr-2" id="menu">
       <ul class="navbar-nav"">
-        <li class="nav-item active"><a class="nav-link" href="/">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="/saved">Saved Articles</a></li>
-        <li class="nav-item"><a id="scrape" class="nav-link btn btn-sm btn-outline-danger" role="button" href="">Scrape New Articles!</a></li>
+        <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+        <li class="nav-item active"><a class="nav-link" href="/saved">Saved Articles</a></li>
       </ul>
     </div>
     </div>
@@ -20,41 +19,40 @@
     <div class="row">
       <div class="col col-sm-12">
         <div class="jumbotron" id="jumbo">
-          <h1 class="display-3 text-white shadow">Mongo Scraper</h1>
-          <h4 class="text-white shadow sub-display">New York Times Edition</h4>
-          <hr class="my-4">
-          <p class="text-white shadow">Scrape articles from the New York Times and store headlines for future reference.</p>
-          <p class="text-white shadow">Post comments on saved articles.</p>
+          <h1 class="display-3 text-white shadow">Saved Articles</h1>
+          <h4 class="text-white shadow sub-display">Your Saved Articles</h4>
         </div>
       </div>
     </div>
 
     <div class="row">
       <div id="newsArea" class="col col-sm-12">
-      	<!-- All articles -->
+        <!-- All articles -->
       </div>
     </div>
 
   </div>
   <!-- Modal -->
-  <div class="modal fade" id="statusModal" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal fade" id="commentsModal" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle">Done</h5>
+          <h5 class="modal-title" id="modalTitle">Comments For Article:</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          ...
+            <div id="comments">
+            </div>
+            <textarea id="newComment" placeholder="New comment..." rows="8" name="newComment"></textarea>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Save Comment</button>
         </div>
       </div>
     </div>
   </div>
   <!-- Custom script -->
-  <script src="javascript/index.js"></script>
+  <script src="javascript/saved.js"></script>
 </body>

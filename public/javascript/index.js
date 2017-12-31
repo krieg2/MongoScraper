@@ -2,20 +2,34 @@ $(document).ready(function(){
 
     refreshData();
 
+    $("#newsArea").on("click", ".save", function(event){
+
+        event.preventDefault();
+
+        var timesId = $(this).data("timesid");
+
+        $.ajax({
+            url: "/api/save/article/"+timesId,
+            method: "PUT"
+        }).done(function(response){
+            refreshData();
+        });
+    });
+
     $("#scrape").on("click", function(event){
 
         event.preventDefault();
 
         $.get("/api/scrape", function(response){
 
-            var modalBody = $("#exampleModalCenter").find(".modal-body");
+            var modalBody = $("#statusModal").find(".modal-body");
 
             if(response === undefined || response.length <= 0){
                 modalBody.text("No new articles at this time. Check again later.");
             } else{
                 modalBody.text(response.length + " new articles found.");
             }
-            $("#exampleModalCenter").modal("show");
+            $("#statusModal").modal("show");
 
             renderArticles(response);
         });
@@ -26,7 +40,7 @@ $(document).ready(function(){
 
 function refreshData(){
 
-    $.get("/api/articles", function(response){
+    $.get("/api/articles/false", function(response){
         renderArticles(response);
     });
 }
@@ -38,13 +52,17 @@ function renderArticles(articles){
         var card = $("<div class='card border-dark mb-4'>");
         var header = $("<div class='card-header'>");
         var body = $("<div class='card-body'>");
-        var aTag = $("<a>");
-        aTag.attr("href", articles[i].link);
-        aTag.attr("target", "_blank");
-        aTag.append("<h3 class='card-title'>"+articles[i].heading+"</h3>");
-        body.append(aTag);
+        var nytLink = $("<a>");
+        var saveButton = $("<button>");
+        saveButton.text("Save Article");
+        saveButton.data("timesid", articles[i].timesId);
+        saveButton.addClass("btn btn-primary save");
+        nytLink.attr("href", articles[i].link);
+        nytLink.attr("target", "_blank");
+        nytLink.append("<h3 class='card-title'>"+articles[i].heading+"</h3>");
+        body.append(nytLink);
         body.append("<p class='card-text'>"+articles[i].summary+"</p>");
-        body.append("<a href='#' class='btn btn-primary'>Save Article</a>");
+        body.append(saveButton);
         card.append(header);
         card.append(body);
 
