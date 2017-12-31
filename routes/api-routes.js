@@ -2,6 +2,7 @@
 module.exports = (app, request, cheerio, Article) => {
 
     app.put("/api/save/article/:id", (req, res) => {
+
         Article.update({timesId: req.params.id}, {saved: true}, (err, rawResponse) => {
             res.end();
         });
@@ -13,7 +14,14 @@ module.exports = (app, request, cheerio, Article) => {
             if (err) console.log(err);
             res.json(data);
         });
+    });
 
+    app.get("/api/article/:id", (req, res) => {
+    
+        Article.findOne({timesId: req.params.id}, "comments", (err, data) => {
+            if (err) console.log(err);
+            res.json(data);
+        });
     });
 
     app.get("/api/articles/:saved", (req, res) => {
@@ -24,7 +32,6 @@ module.exports = (app, request, cheerio, Article) => {
             if (err) console.log(err);
             res.json(data);
         });
-
     });
 
     app.get("/api/scrape", (req, res) => {

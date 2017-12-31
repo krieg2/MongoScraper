@@ -12,3 +12,7 @@
   font-family: "Cormorant SC";
   font-weight: 600;
 }
+
+#newComment {
+  width: 100%;
+}

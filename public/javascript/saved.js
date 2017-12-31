@@ -2,25 +2,31 @@ $(document).ready(function(){
 
     refreshData();
 
- //    $("#scrape").on("click", function(event){
+     $("#newsArea").on("click", ".view-comments", function(event){
 
- //        event.preventDefault();
+        event.preventDefault();
 
- //        $.get("/api/scrape", function(response){
+        var timesId = $(this).data("timesid");
+        $.get("/api/article/"+timesId, function(response){
 
- //            var modalBody = $("#statusModal").find(".modal-body");
+            var commentsArea = $("#commentsArea");
+            if(response === undefined || response.length <= 0 ||
+               response.comments === undefined || response.comments.length <= 0){
 
- //            if(response === undefined || response.length <= 0){
- //                modalBody.text("No new articles at this time. Check again later.");
- //            } else{
- //                modalBody.text(response.length + " new articles found.");
- //            }
- //            $("#statusModal").modal("show");
+                var div = $("<div>");
+                div.addClass("border border-primary m-2 mx-auto");
+                div.text("No comments yet.");
+                commentsArea.append(div);
+            } else{
 
- //            renderArticles(response);
- //        });
-
-	// });
+                for(var i=0; i < response.comments.length; i++){
+                    var div = $("<div>");
+                    div.text(response.comments[i]);
+                    commentsArea.append(div);
+                }
+            }
+        });
+    });
 
 });
 
@@ -44,7 +50,7 @@ function renderArticles(articles){
         commentsButton.data("timesid", articles[i].timesId);
         commentsButton.attr("data-toggle", "modal");
         commentsButton.attr("data-target", "#commentsModal");
-        commentsButton.addClass("btn btn-secondary m-2 comments");
+        commentsButton.addClass("btn btn-secondary m-2 view-comments");
         commentsButton.css("float", "right");
 
         var deleteButton = $("<button type='button'>");
