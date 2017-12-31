@@ -2,25 +2,45 @@ $(document).ready(function(){
 
     refreshData();
 
-     $("#newsArea").on("click", ".view-comments", function(event){
+    $("#saveComment").on("click", function(event){
+
+        var timesId = $("#commentsModal").data("timesid");
+        var newComment = $("#newComment").val();
+        var data = {
+            comment: newComment
+        };
+        if(newComment !== ""){
+            $.post("/api/comment/"+timesId, data, function(response){
+                //
+            });
+        } else{
+            //
+        }
+    });
+
+    $("#newsArea").on("click", ".view-comments", function(event){
 
         event.preventDefault();
 
         var timesId = $(this).data("timesid");
+        $("#commentsModal").data("timesid", timesId);
         $.get("/api/article/"+timesId, function(response){
 
             var commentsArea = $("#commentsArea");
+            $("#commentsArea").empty();
+
             if(response === undefined || response.length <= 0 ||
                response.comments === undefined || response.comments.length <= 0){
 
                 var div = $("<div>");
-                div.addClass("border border-primary m-2 mx-auto");
+                div.addClass("border border-primary m-2 p-1 mx-auto");
                 div.text("No comments yet.");
                 commentsArea.append(div);
             } else{
 
                 for(var i=0; i < response.comments.length; i++){
                     var div = $("<div>");
+                    div.addClass("border border-primary m-2 p-1 mx-auto");
                     div.text(response.comments[i]);
                     commentsArea.append(div);
                 }

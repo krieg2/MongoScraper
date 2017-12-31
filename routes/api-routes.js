@@ -1,6 +1,14 @@
 
 module.exports = (app, request, cheerio, Article) => {
 
+    app.post("/api/comment/:id", (req, res) => {
+console.log(req.params.id);
+console.log(req.body);
+        Article.update({timesId: req.params.id}, {$push: {comments: req.body.comment}}, (err, rawResponse) => {
+            res.end();
+        });
+    });
+
     app.put("/api/save/article/:id", (req, res) => {
 
         Article.update({timesId: req.params.id}, {saved: true}, (err, rawResponse) => {
