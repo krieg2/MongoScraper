@@ -18,13 +18,14 @@ mongoose.connect("mongodb://localhost/mongoHeadlines");
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 
+var ObjectId = mongoose.Schema.Types.ObjectId;
 var schema = new mongoose.Schema({
     timesId   : String,
     heading   : String,
     link      : String,
     summary   : String,
     saved     : { type: Boolean, default: false },
-    comments  : [ String ]
+    comments  : [ {_id: ObjectId, comment: String} ]
 });
  
 var Article = mongoose.model("Article", schema);
@@ -44,7 +45,7 @@ app.set("view engine", "handlebars");
 
 // Create routes.
 require("./routes/html-routes.js")(app, Article);
-require("./routes/api-routes.js")(app, request, cheerio, Article);
+require("./routes/api-routes.js")(app, request, cheerio, mongoose, Article);
 
 app.listen(port, function(){
     console.log("App running on port " + port);

@@ -2,6 +2,21 @@ $(document).ready(function(){
 
     refreshData();
 
+    $("#commentsModal").on("click", ".delete-comment", function(event){
+
+        var timesId = $("#commentsModal").data("timesid");
+        var commentId = $(this).data("comment-id");
+        $.ajax({
+            url: "/api/comment/"+timesId+"/"+commentId,
+            method: "DELETE"
+        }).done(function(res){
+            var id = $("#commentsModal").data("timesid");
+            $.get("/api/article/"+id, function(response){
+                renderComments(response);
+            });
+        });
+    });
+
     $("#saveComment").on("click", function(event){
 
         var timesId = $("#commentsModal").data("timesid");
@@ -11,10 +26,10 @@ $(document).ready(function(){
         };
         if(newComment !== ""){
             $.post("/api/comment/"+timesId, data, function(response){
-                //
+                $("#newComment").val("");
             });
         } else{
-            //
+            alert("Please add a comment.");
         }
     });
 
@@ -26,25 +41,7 @@ $(document).ready(function(){
         $("#commentsModal").data("timesid", timesId);
         $.get("/api/article/"+timesId, function(response){
 
-            var commentsArea = $("#commentsArea");
-            $("#commentsArea").empty();
-
-            if(response === undefined || response.length <= 0 ||
-               response.comments === undefined || response.comments.length <= 0){
-
-                var div = $("<div>");
-                div.addClass("border border-primary m-2 p-1 mx-auto");
-                div.text("No comments yet.");
-                commentsArea.append(div);
-            } else{
-
-                for(var i=0; i < response.comments.length; i++){
-                    var div = $("<div>");
-                    div.addClass("border border-primary m-2 p-1 mx-auto");
-                    div.text(response.comments[i]);
-                    commentsArea.append(div);
-                }
-            }
+            renderComments(response);
         });
     });
 
@@ -55,6 +52,34 @@ function refreshData(){
     $.get("/api/articles/true", function(response){
         renderArticles(response);
     });
+}
+
+function renderComments(commentsResponse){
+
+    var commentsArea = $("#commentsArea");
+    $("#commentsArea").empty();
+
+    if(commentsResponse === undefined || commentsResponse.length <= 0 ||
+       commentsResponse.comments === undefined || commentsResponse.comments.length <= 0){
+
+        var div = $("<div>");
+        div.addClass("border border-primary m-2 p-1 mx-auto");
+        div.text("No comments yet.");
+        commentsArea.append(div);
+    } else{
+
+        for(var i=0; i < commentsResponse.comments.length; i++){
+            var div = $("<div>");
+            div.addClass("border border-primary m-2 p-1 mx-auto");
+            div.text(commentsResponse.comments[i].comment);
+            var button = $("<button type='button'>");
+            button.addClass("close delete-comment");
+            button.data("comment-id", commentsResponse.comments[i]._id);
+            button.html("<span aria-hidden='true'>&times;</span>");
+            div.append(button);
+            commentsArea.append(div);
+        }
+    }
 }
 
 function renderArticles(articles){

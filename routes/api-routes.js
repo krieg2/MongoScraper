@@ -1,10 +1,24 @@
 
-module.exports = (app, request, cheerio, Article) => {
+module.exports = (app, request, cheerio, mongoose, Article) => {
+
+    app.delete("/api/comment/:id/:commentid", (req, res) => {
+
+        var deleteComment = {
+            _id: req.params.commentid
+        };
+        Article.update({timesId: req.params.id}, {$pull: {comments: deleteComment}}, (err, rawResponse) => {
+            res.end();
+        });
+    });
 
     app.post("/api/comment/:id", (req, res) => {
-console.log(req.params.id);
-console.log(req.body);
-        Article.update({timesId: req.params.id}, {$push: {comments: req.body.comment}}, (err, rawResponse) => {
+
+        var newId = new mongoose.mongo.ObjectId();
+        var newComment = {
+            _id: newId,
+            comment: req.body.comment
+        };
+        Article.update({timesId: req.params.id}, {$push: {comments: newComment}}, (err, rawResponse) => {
             res.end();
         });
     });
