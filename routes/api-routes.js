@@ -4,9 +4,9 @@ module.exports = (app, request, cheerio, mongoose, Article) => {
     app.delete("/api/comment/:id/:commentid", (req, res) => {
 
         var deleteComment = {
-            _id: req.params.commentid
+            "_id" : req.params.commentid
         };
-        Article.update({timesId: req.params.id}, {$pull: {comments: deleteComment}}, (err, rawResponse) => {
+        Article.update({"timesId" : req.params.id}, {$pull: {"comments" : deleteComment}}, (err, rawResponse) => {
             res.end();
         });
     });
@@ -18,14 +18,21 @@ module.exports = (app, request, cheerio, mongoose, Article) => {
             _id: newId,
             comment: req.body.comment
         };
-        Article.update({timesId: req.params.id}, {$push: {comments: newComment}}, (err, rawResponse) => {
+        Article.update({"timesId" : req.params.id}, {$push: {"comments" : newComment}}, (err, rawResponse) => {
             res.end();
         });
     });
 
     app.put("/api/save/article/:id", (req, res) => {
 
-        Article.update({timesId: req.params.id}, {saved: true}, (err, rawResponse) => {
+        Article.update({"timesId" : req.params.id}, {"saved" : true}, (err, rawResponse) => {
+            res.end();
+        });
+    });
+
+    app.put("/api/remove/article/:id", (req, res) => {
+
+        Article.update({"timesId" : req.params.id}, {"saved" : false}, (err, rawResponse) => {
             res.end();
         });
     });
@@ -40,7 +47,7 @@ module.exports = (app, request, cheerio, mongoose, Article) => {
 
     app.get("/api/article/:id", (req, res) => {
     
-        Article.findOne({timesId: req.params.id}, "comments", (err, data) => {
+        Article.findOne({"timesId" : req.params.id}, "comments", (err, data) => {
             if (err) console.log(err);
             res.json(data);
         });
@@ -50,7 +57,7 @@ module.exports = (app, request, cheerio, mongoose, Article) => {
     
         // Convert string to boolean.
         var saved = (req.params.saved === "true") ? true : false;
-        Article.find({saved: saved}, (err, data) => {
+        Article.find({"saved" : saved}, (err, data) => {
             if (err) console.log(err);
             res.json(data);
         });

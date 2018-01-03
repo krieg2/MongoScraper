@@ -16,3 +16,7 @@
 #newComment {
   width: 100%;
 }
+
+.btn {
+  cursor: pointer;
+}

@@ -1,8 +1,12 @@
 $(document).ready(function(){
 
+    // Begin with a data query.
     refreshData();
 
+    // Article Comments modal dialog delete button (X).
     $("#commentsModal").on("click", ".delete-comment", function(event){
+
+        event.preventDefault();
 
         var timesId = $("#commentsModal").data("timesid");
         var commentId = $(this).data("comment-id");
@@ -17,50 +21,84 @@ $(document).ready(function(){
         });
     });
 
+    // Article Comments modal dialog Save Comment button.
     $("#saveComment").on("click", function(event){
+
+        event.preventDefault();
 
         var timesId = $("#commentsModal").data("timesid");
         var newComment = $("#newComment").val();
         var data = {
             comment: newComment
         };
+        // Ensure that a comment has been entered.
+        // Otherwise alert the user and do not close yet.
+        // Upper righthand corner X will close the dialog.
         if(newComment !== ""){
+            $("#commentsModal").modal("hide");
+            // Post the comment to the server API.
             $.post("/api/comment/"+timesId, data, function(response){
                 $("#newComment").val("");
             });
-        } else{
+        } else{ 
             alert("Please add a comment.");
         }
     });
 
+    // Article Comments button invokes the modal dialog.
     $("#newsArea").on("click", ".view-comments", function(event){
 
         event.preventDefault();
 
+        // Populate the article ID in the modal for
+        // subsequent comment posting on that article.
         var timesId = $(this).data("timesid");
         $("#commentsModal").data("timesid", timesId);
+
+        // Pull up the comment history from the server API.
         $.get("/api/article/"+timesId, function(response){
 
             renderComments(response);
         });
     });
 
+    // Delete From Saved button.
+    $("#newsArea").on("click", ".delete", function(event){
+
+        event.preventDefault();
+
+        var timesId = $(this).data("timesid");
+
+        // Send a PUT to the remove article API route.
+        $.ajax({
+            url: "/api/remove/article/"+timesId,
+            method: "PUT"
+        }).done(function(response){
+            // Refresh the page data.
+            refreshData();
+        });
+    });
 });
 
 function refreshData(){
 
+    // Retreive all saved articles from the server API.
+    // Then render on the page.
     $.get("/api/articles/true", function(response){
+        $("#newsArea").empty();
         renderArticles(response);
     });
 }
 
+// Build each comment div and render on the modal.
 function renderComments(commentsResponse){
 
     var commentsArea = $("#commentsArea");
     $("#commentsArea").empty();
 
     if(commentsResponse === undefined || commentsResponse.length <= 0 ||
-       commentsResponse.comments === undefined || commentsResponse.comments.length <= 0){
+       commentsResponse.comments === undefined ||
+       commentsResponse.comments.length <= 0){
 
         var div = $("<div>");
         div.addClass("border border-primary m-2 p-1 mx-auto");
@@ -82,6 +120,8 @@ function renderComments(commentsResponse){
     }
 }
 
+// Build each article card and render on the page.
+// Article Comments and Delete From Saved buttons created here.
 function renderArticles(articles){
 
     for(var i=0; i < articles.length; i++){
@@ -119,6 +159,8 @@ function renderArticles(articles){
         $("#newsArea").prepend(card);
     }
 
+    // Display a warning if no articles exist.
+    // Otherwise remove the warning.
     if( $("#newsArea").children(".card").length === 0 ){
         renderEmpty();
     } else{
@@ -127,19 +169,23 @@ function renderArticles(articles){
 
 }
 
+// Display a warning if no articles exist.
 function renderEmpty(){
 
-    var div = $("<div class='alert alert-warning' role='alert'>");
-    div.text("No artciles have been saved!");
-    div.attr("id", "no-articles-warning");
-    $("#newsArea").prepend(div);
+    if( $("#newsArea").children("#no-articles-warning").length === 0 ){
+        var div = $("<div class='alert alert-warning' role='alert'>");
+        div.text("No artciles have been saved!");
+        div.attr("id", "no-articles-warning");
+        $("#newsArea").prepend(div);
+    }
 
 }
 
+// Remove the no articles warning.
 function removeEmpty(){
 
-    if( $("#newsArea").children(".alert").length > 0 ){
-        $("#no-articles-warning").detach();
+    if( $("#newsArea").children("#no-articles-warning").length > 0 ){
+        $("#no-articles-warning").remove();
     }
 
 }

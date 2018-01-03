@@ -1,7 +1,9 @@
 $(document).ready(function(){
 
+    // Begin with a data query.
     refreshData();
 
+    // Save Article button.
     $("#newsArea").on("click", ".save", function(event){
 
         event.preventDefault();
@@ -16,6 +18,7 @@ $(document).ready(function(){
         });
     });
 
+    // Scrape New Articles button.
     $("#scrape").on("click", function(event){
 
         event.preventDefault();
@@ -24,6 +27,7 @@ $(document).ready(function(){
 
             var modalBody = $("#statusModal").find(".modal-body");
 
+            // Update the user with a status modal.
             if(response === undefined || response.length <= 0){
                 modalBody.text("No new articles at this time. Check again later.");
             } else{
@@ -40,11 +44,16 @@ $(document).ready(function(){
 
 function refreshData(){
 
+    // Retreive all unsaved articles from the server API.
+    // Then render on the page.
     $.get("/api/articles/false", function(response){
+        $("#newsArea").empty();
         renderArticles(response);
     });
 }
 
+// Build each article card and render on the page.
+// Save Article buttons are created here.
 function renderArticles(articles){
 
     for(var i=0; i < articles.length; i++){
@@ -77,19 +86,23 @@ function renderArticles(articles){
 
 }
 
+// Display a warning if no articles exist.
 function renderEmpty(){
 
-    var div = $("<div class='alert alert-warning' role='alert'>");
-    div.text("No new artciles have been added!");
-    div.attr("id", "no-articles-warning");
-    $("#newsArea").prepend(div);
+    if( $("#newsArea").children("#no-articles-warning").length === 0 ){
+        var div = $("<div class='alert alert-warning' role='alert'>");
+        div.text("No new artciles have been added!");
+        div.attr("id", "no-articles-warning");
+        $("#newsArea").prepend(div);
+    }
 
 }
 
+// Remove the no articles warning.
 function removeEmpty(){
 
-    if( $("#newsArea").children(".alert").length > 0 ){
-        $("#no-articles-warning").detach();
+    if( $("#newsArea").children("#no-articles-warning").length > 0 ){
+        $("#no-articles-warning").remove();
     }
 
 }
