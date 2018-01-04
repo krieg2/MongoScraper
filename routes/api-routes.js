@@ -1,71 +1,108 @@
+const request    = require("request");
+const cheerio    = require("cheerio");
 
-module.exports = (app, request, cheerio, mongoose, Article) => {
+module.exports = (app, mongoose, db) => {
 
+    // Delete a comment given the article id and comment id.
     app.delete("/api/comment/:id/:commentid", (req, res) => {
 
-        var deleteComment = {
-            "_id" : req.params.commentid
-        };
-        Article.update({"timesId" : req.params.id}, {$pull: {"comments" : deleteComment}}, (err, rawResponse) => {
-            res.end();
+        var commentId = req.params.commentid;
+
+        db.Article.findOneAndUpdate({_id: req.params.id},
+                 { $pull: {comments: commentId } }, { new: true })
+        .then(function(article){
+            res.json(article);
+        })
+        .catch(function(err){
+            res.json(err);
         });
     });
 
+    // Post a new comment given the article id.
     app.post("/api/comment/:id", (req, res) => {
 
-        var newId = new mongoose.mongo.ObjectId();
-        var newComment = {
-            _id: newId,
-            comment: req.body.comment
-        };
-        Article.update({"timesId" : req.params.id}, {$push: {"comments" : newComment}}, (err, rawResponse) => {
-            res.end();
+        db.Comment.create({
+            body: req.body.comment
+        })
+        .then(function(newComment){
+            return db.Article.findOneAndUpdate({_id: req.params.id},
+                { $push: {comments: newComment._id } }, { new: true });
+        })
+        .then(function(article){
+            res.json(article);
+        })
+        .catch(function(err) {
+            res.json(err);
         });
     });
 
+    // Save an article by updating the saved field to true.
     app.put("/api/save/article/:id", (req, res) => {
 
-        Article.update({"timesId" : req.params.id}, {"saved" : true}, (err, rawResponse) => {
-            res.end();
+        db.Article.update({_id: req.params.id}, {"saved" : true})
+        .then(function(article){
+            res.json(article);
         });
     });
 
+    // Remove an article from Saved by updating the saved field to false.
     app.put("/api/remove/article/:id", (req, res) => {
 
-        Article.update({"timesId" : req.params.id}, {"saved" : false}, (err, rawResponse) => {
-            res.end();
+        db.Article.update({_id: req.params.id}, {"saved" : false})
+        .then(function(article){
+            res.json(article);
         });
     });
 
+    // Find all articles.
     app.get("/api/articles", (req, res) => {
     
-        Article.find({}, (err, data) => {
-            if (err) console.log(err);
+        db.Article.find({})
+        .then(function(data){
             res.json(data);
+        })
+        .catch(function(err){
+            res.json(err);
         });
     });
 
-    app.get("/api/article/:id", (req, res) => {
-    
-        Article.findOne({"timesId" : req.params.id}, "comments", (err, data) => {
-            if (err) console.log(err);
-            res.json(data);
-        });
-    });
-
+    // Find all saved or unsaved articles using the true/false saved field.
     app.get("/api/articles/:saved", (req, res) => {
     
         // Convert string to boolean.
         var saved = (req.params.saved === "true") ? true : false;
-        Article.find({"saved" : saved}, (err, data) => {
-            if (err) console.log(err);
+        db.Article.find({"saved" : saved})
+        .then(function(data){
             res.json(data);
+        })
+        .catch(function(err){
+            res.json(err);
         });
     });
 
+    // Find a specific article by id.
+    app.get("/api/article/:id", (req, res) => {
+    
+        db.Article.findOne({_id: req.params.id})
+        .populate("comments")
+        .then(function(data){
+            // Return the article including comments.
+            res.json(data);
+        })
+        .catch(function(err){
+            res.json(err);
+        });
+    });
+
+    // Here is where the magic happens.
+    // The Scrape New Articles button will trigger this route.
+    // Request the New York Times front page and save
+    // the top news headings into the MongoDB model.
     app.get("/api/scrape", (req, res) => {
 
-        Article.find({}, (err, data) => {
+        // Find all articles and hash their NYT ids.
+        // Use the storyIds hash to prevent scraping duplicates.
+        db.Article.find({}, (err, data) => {
 
             var storyIds = [];
             for(let i=0; i < data.length; i++){
@@ -99,7 +136,7 @@ module.exports = (app, request, cheerio, mongoose, Article) => {
                               saved:   false
                             };
                             results.push(article);
-                            Article.create(article, (err, data) => {
+                            db.Article.create(article, (err, data) => {
                                 if (err) console.log(err);
                                 // saved!
                             });

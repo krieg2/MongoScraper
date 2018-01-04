@@ -8,13 +8,13 @@ $(document).ready(function(){
 
         event.preventDefault();
 
-        var timesId = $("#commentsModal").data("timesid");
+        var articleId = $("#commentsModal").data("article-id");
         var commentId = $(this).data("comment-id");
         $.ajax({
-            url: "/api/comment/"+timesId+"/"+commentId,
+            url: "/api/comment/"+articleId+"/"+commentId,
             method: "DELETE"
         }).done(function(res){
-            var id = $("#commentsModal").data("timesid");
+            var id = $("#commentsModal").data("article-id");
             $.get("/api/article/"+id, function(response){
                 renderComments(response);
             });
@@ -26,7 +26,7 @@ $(document).ready(function(){
 
         event.preventDefault();
 
-        var timesId = $("#commentsModal").data("timesid");
+        var articleId = $("#commentsModal").data("article-id");
         var newComment = $("#newComment").val();
         var data = {
             comment: newComment
@@ -37,7 +37,7 @@ $(document).ready(function(){
         if(newComment !== ""){
             $("#commentsModal").modal("hide");
             // Post the comment to the server API.
-            $.post("/api/comment/"+timesId, data, function(response){
+            $.post("/api/comment/"+articleId, data, function(response){
                 $("#newComment").val("");
             });
         } else{ 
@@ -52,11 +52,11 @@ $(document).ready(function(){
 
         // Populate the article ID in the modal for
         // subsequent comment posting on that article.
-        var timesId = $(this).data("timesid");
-        $("#commentsModal").data("timesid", timesId);
+        var articleId = $(this).data("article-id");
+        $("#commentsModal").data("article-id", articleId);
 
         // Pull up the comment history from the server API.
-        $.get("/api/article/"+timesId, function(response){
+        $.get("/api/article/"+articleId, function(response){
 
             renderComments(response);
         });
@@ -67,11 +67,11 @@ $(document).ready(function(){
 
         event.preventDefault();
 
-        var timesId = $(this).data("timesid");
+        var articleId = $(this).data("article-id");
 
         // Send a PUT to the remove article API route.
         $.ajax({
-            url: "/api/remove/article/"+timesId,
+            url: "/api/remove/article/"+articleId,
             method: "PUT"
         }).done(function(response){
             // Refresh the page data.
@@ -109,7 +109,7 @@ function renderComments(commentsResponse){
         for(var i=0; i < commentsResponse.comments.length; i++){
             var div = $("<div>");
             div.addClass("border border-primary m-2 p-1 mx-auto");
-            div.text(commentsResponse.comments[i].comment);
+            div.text(commentsResponse.comments[i].body);
             var button = $("<button type='button'>");
             button.addClass("close delete-comment");
             button.data("comment-id", commentsResponse.comments[i]._id);
@@ -132,7 +132,7 @@ function renderArticles(articles){
 
         var commentsButton = $("<button type='button'>");
         commentsButton.text("Article Comments");
-        commentsButton.data("timesid", articles[i].timesId);
+        commentsButton.data("article-id", articles[i]._id);
         commentsButton.attr("data-toggle", "modal");
         commentsButton.attr("data-target", "#commentsModal");
         commentsButton.addClass("btn btn-secondary m-2 view-comments");
@@ -140,7 +140,7 @@ function renderArticles(articles){
 
         var deleteButton = $("<button type='button'>");
         deleteButton.text("Delete From Saved");
-        deleteButton.data("timesid", articles[i].timesId);
+        deleteButton.data("article-id", articles[i]._id);
         deleteButton.addClass("btn btn-danger m-2 delete");
         deleteButton.css("float", "right");
 

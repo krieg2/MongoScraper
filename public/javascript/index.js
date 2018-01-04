@@ -8,10 +8,10 @@ $(document).ready(function(){
 
         event.preventDefault();
 
-        var timesId = $(this).data("timesid");
+        var articleId = $(this).data("article-id");
 
         $.ajax({
-            url: "/api/save/article/"+timesId,
+            url: "/api/save/article/"+articleId,
             method: "PUT"
         }).done(function(response){
             refreshData();
@@ -64,7 +64,7 @@ function renderArticles(articles){
         var nytLink = $("<a>");
         var saveButton = $("<button>");
         saveButton.text("Save Article");
-        saveButton.data("timesid", articles[i].timesId);
+        saveButton.data("article-id", articles[i]._id);
         saveButton.addClass("btn btn-primary save");
         nytLink.attr("href", articles[i].link);
         nytLink.attr("target", "_blank");
