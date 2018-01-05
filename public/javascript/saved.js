@@ -112,6 +112,7 @@ function renderComments(commentsResponse){
             div.text(commentsResponse.comments[i].body);
             var button = $("<button type='button'>");
             button.addClass("close delete-comment");
+            button.css("line-height", "20px");
             button.data("comment-id", commentsResponse.comments[i]._id);
             button.html("<span aria-hidden='true'>&times;</span>");
             div.append(button);

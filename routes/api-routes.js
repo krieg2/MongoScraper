@@ -116,19 +116,22 @@ module.exports = (app, mongoose, db) => {
 
                 $("#top-news").find("article").each( (i, element) => {
 
-                    var id = $(element).data("story-id");
+                    let id = String($(element).data("story-id"));
+                    id = id.trim();
 
-                    if(storyIds[id] === undefined){
+                    // Only if NYT story id has not been seen yet.
+                    if(id !== undefined && id !== "" &&
+                       storyIds[id] === undefined){
 
-                        var heading = $(element).find("h2.story-heading").first();
-                        var link = $(heading).find("a").first();
-                        var linkText = link.text().trim();
-                        var linkHref = link.attr("href");
-                        var summary = $(element).find("p[class=summary]").first().text().trim();
+                        let heading = $(element).find("h2.story-heading").first();
+                        let link = $(heading).find("a").first();
+                        let linkText = link.text().trim();
+                        let linkHref = link.attr("href");
+                        let summary = $(element).find("p[class=summary]").first().text().trim();
                         
                         // Save these results, if there is a heading, summary and link.
                         if(linkText !== "" && summary !== "" && linkHref !== ""){
-                            var article = {
+                            let article = {
                               timesId: id,
                               heading: linkText,
                               link:    linkHref,
@@ -136,16 +139,20 @@ module.exports = (app, mongoose, db) => {
                               saved:   false
                             };
                             results.push(article);
-                            db.Article.create(article, (err, data) => {
-                                if (err) console.log(err);
-                                // saved!
-                            });
                         }
                     }
-
                 }); // end each
 
-                res.json(results);
+                // Create the articles in MongoDB all in one go,
+                // so we can respond with all data for the client.
+                db.Article.create(results)
+                .then( (newArticles) => {
+                    res.json(newArticles);
+                })
+                .catch( (err) => {
+                    console.log(err);
+                });
+
             }); // end request
         }); // end find
 
