@@ -1,4 +1,4 @@
-var mongoose = require("mongoose");
+User.jsvar mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var Schema = new Schema({
