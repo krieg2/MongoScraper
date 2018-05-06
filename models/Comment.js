@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
-var Schema = new Schema({
+var CommentSchema = new Schema({
   body: {
   	type: String,
     required: true
@@ -9,7 +9,7 @@ var Schema = new Schema({
 });
 
 // Creates the model from the above schema.
-var Comment = mongoose.model("Comment", Schema);
+var Comment = mongoose.model("Comment", CommentSchema);
 
 // Export the Comment model.
 module.exports = Comment;

@@ -1,1 +1,5 @@
-index.js
+// Export an object containing all of the models.
+module.exports = {
+  Article: require("./Article"),
+  Comment: require("./Comment")
+};

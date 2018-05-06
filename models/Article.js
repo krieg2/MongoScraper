@@ -1,7 +1,7 @@
-User.jsvar mongoose = require("mongoose");
+var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
-var Schema = new Schema({
+var ArticleSchema = new Schema({
   timesId: {
     type: String,
     required: true
@@ -29,7 +29,7 @@ var Schema = new Schema({
 });
 
 // Creates the model from the above schema.
-var Article = mongoose.model("Article", Schema);
+var Article = mongoose.model("Article", ArticleSchema);
 
 // Export the Article model.
 module.exports = Article;
