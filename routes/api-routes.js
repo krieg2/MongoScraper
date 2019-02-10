@@ -39,7 +39,7 @@ module.exports = (app, mongoose, db) => {
     // Save an article by updating the saved field to true.
     app.put("/api/save/article/:id", (req, res) => {
 
-        db.Article.update({_id: req.params.id}, {"saved" : true})
+        db.Article.updateOne({_id: req.params.id}, {"saved" : true})
         .then(function(article){
             res.json(article);
         });
@@ -48,7 +48,7 @@ module.exports = (app, mongoose, db) => {
     // Remove an article from Saved by updating the saved field to false.
     app.put("/api/remove/article/:id", (req, res) => {
 
-        db.Article.update({_id: req.params.id}, {"saved" : false})
+        db.Article.updateOne({_id: req.params.id}, {"saved" : false})
         .then(function(article){
             res.json(article);
         });
@@ -56,7 +56,7 @@ module.exports = (app, mongoose, db) => {
 
     // Find all articles.
     app.get("/api/articles", (req, res) => {
-    
+
         db.Article.find({})
         .then(function(data){
             res.json(data);
@@ -68,7 +68,7 @@ module.exports = (app, mongoose, db) => {
 
     // Find all saved or unsaved articles using the true/false saved field.
     app.get("/api/articles/:saved", (req, res) => {
-    
+
         // Convert string to boolean.
         var saved = (req.params.saved === "true") ? true : false;
         db.Article.find({"saved" : saved})
@@ -82,7 +82,7 @@ module.exports = (app, mongoose, db) => {
 
     // Find a specific article by id.
     app.get("/api/article/:id", (req, res) => {
-    
+
         db.Article.findOne({_id: req.params.id})
         .populate("comments")
         .then(function(data){
@@ -101,12 +101,12 @@ module.exports = (app, mongoose, db) => {
     app.get("/api/scrape", (req, res) => {
 
         // Find all articles and hash their NYT ids.
-        // Use the storyIds hash to prevent scraping duplicates.
+        // Use the storyUrls hash to prevent scraping duplicates.
         db.Article.find({}, (err, data) => {
 
-            var storyIds = [];
+            var storyUrls = [];
             for(let i=0; i < data.length; i++){
-                storyIds[ data[i].timesId ] = true;
+                storyUrls[ data[i].linkHref ] = true;
             }
 
             request("https://www.nytimes.com", (error, response, html) => {
@@ -114,32 +114,38 @@ module.exports = (app, mongoose, db) => {
                 var $ = cheerio.load(html);
                 var results = [];
 
-                $("#top-news").find("article").each( (i, element) => {
+                $("body").find("article").each( (i, element) => {
 
-                    let id = String($(element).data("story-id"));
-                    id = id.trim();
+                    let link = $(element).find("a").first();
+                    let linkText = link.text().trim();
+                    let linkHref = link.attr("href");
+                    let summary = $(element).find("p").first().text().trim();
 
-                    // Only if NYT story id has not been seen yet.
-                    if(id !== undefined && id !== "" &&
-                       storyIds[id] === undefined){
+                    if(summary == "" || summary === undefined){
+                        let bullet1 = $(element).find("li").eq(0).text().trim();
+                        let bullet2 = $(element).find("li").eq(1).text().trim();
 
-                        let heading = $(element).find("h2.story-heading").first();
-                        let link = $(heading).find("a").first();
-                        let linkText = link.text().trim();
-                        let linkHref = link.attr("href");
-                        let summary = $(element).find("p[class=summary]").first().text().trim();
-                        
-                        // Save these results, if there is a heading, summary and link.
-                        if(linkText !== "" && summary !== "" && linkHref !== ""){
-                            let article = {
-                              timesId: id,
-                              heading: linkText,
-                              link:    linkHref,
-                              summary: summary,
-                              saved:   false
-                            };
-                            results.push(article);
+                        if(bullet1){
+                            summary = bullet1;
                         }
+                        if(bullet2){
+                          summary += "\n" + bullet2;
+                        }
+                    }
+
+                    if(linkText !== "" && summary !== "" && linkHref !== "" &&
+                        storyUrls[linkHref] === undefined){
+
+                        // Save these results, if there is a heading, summary and link,
+                        // and it has not been seen before.
+
+                        let article = {
+                          heading: linkText,
+                          link:    linkHref,
+                          summary: summary,
+                          saved:   false
+                        };
+                        results.push(article);
                     }
                 }); // end each
 

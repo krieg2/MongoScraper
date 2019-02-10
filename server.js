@@ -16,7 +16,7 @@ const db = require("./models");
 // Database configuration
 mongoose.Promise = Promise;
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
-mongoose.connect(MONGODB_URI);
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
 mongoose.connection.on("error", console.error.bind(console, "connection error:"));
 
 // var ObjectId = mongoose.Schema.Types.ObjectId;

@@ -2,10 +2,6 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var ArticleSchema = new Schema({
-  timesId: {
-    type: String,
-    required: true
-  },
   heading: {
     type: String,
     required: true
